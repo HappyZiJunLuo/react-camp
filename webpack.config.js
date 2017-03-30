@@ -1,10 +1,10 @@
-const { resolve } = require('path');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
 module.exports = {
   devtool: 'inline-source-map',
-  context: resolve(__dirname, 'src'),
+  context: path.resolve(__dirname, 'src'),
   entry: [
     'react-hot-loader/patch',
     // activate HMR for React
@@ -21,12 +21,12 @@ module.exports = {
     // the entry point of our app
   ],
   output: {
-    path: resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
     publicPath: '/'
   },
   devServer: {
-    contentBase: resolve(__dirname, 'dist'),
+    contentBase: path.resolve(__dirname, 'dist'),
     hot: true,
     publicPath: '/'
   },
@@ -34,17 +34,30 @@ module.exports = {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        use: ['babel-loader'],
+        loader: 'babel-loader',
+        query: {
+          plugins: ['transform-decorators-legacy'],
+          presets: ['es2015', 'react', 'stage-2']
+        },
         exclude: /node_modules/
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader?modules', 'postcss-loader']
+        use: ['style-loader', 'css-loader', 'postcss-loader']
       },
       {
         test: /\.scss$/,
         use: ['style-loader', 'css-loader', 'sass-loader']
-      }
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif|svg|woff|woff2)$/,
+        loader: 'url-loader?limit=10000',
+      },
+      //fonts loader
+      { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,   loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,    loader: "url-loader?limit=10000&mimetype=application/octet-stream" },
+      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,    loader: "file-loader" },
+      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,    loader: "url-loader?limit=10000&mimetype=image/svg+xml" }
     ]
   },
   plugins: [
@@ -53,7 +66,8 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     new HtmlWebpackPlugin({
       title: 'React Todo App',
-      favicon: resolve(__dirname, 'hamburger.ico')
+      template: path.resolve(__dirname, 'index.html'),
+      favicon: path.resolve(__dirname, 'hamburger.ico')
     })
   ]
 };
